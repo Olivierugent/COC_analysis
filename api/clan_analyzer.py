@@ -45,12 +45,14 @@ HEADERS = {
 # ============================================================================
 
 # Hero max levels by Town Hall (TH7-TH17)
+# Updated for 2025 with Hero Hall system - levels are approximate max at each TH
+# Note: Actual max depends on Hero Hall level, these are typical maximums
 HERO_MAX_LEVELS = {
-    "Barbarian King": {7: 5, 8: 10, 9: 30, 10: 40, 11: 50, 12: 65, 13: 75, 14: 80, 15: 90, 16: 95, 17: 100},
-    "Archer Queen": {9: 30, 10: 40, 11: 50, 12: 65, 13: 75, 14: 80, 15: 90, 16: 95, 17: 100},
-    "Grand Warden": {11: 20, 12: 40, 13: 50, 14: 55, 15: 65, 16: 70, 17: 75},
-    "Royal Champion": {13: 25, 14: 30, 15: 40, 16: 45, 17: 50},
-    "Minion Prince": {14: 40, 15: 50, 16: 60, 17: 70},  # Builder base hero but shows in home
+    "Barbarian King": {7: 5, 8: 10, 9: 30, 10: 40, 11: 50, 12: 65, 13: 75, 14: 85, 15: 90, 16: 95, 17: 100, 18: 105},
+    "Archer Queen": {8: 10, 9: 30, 10: 40, 11: 50, 12: 65, 13: 75, 14: 85, 15: 90, 16: 95, 17: 100, 18: 105},
+    "Grand Warden": {11: 20, 12: 40, 13: 50, 14: 55, 15: 65, 16: 70, 17: 75, 18: 80},
+    "Royal Champion": {13: 25, 14: 30, 15: 40, 16: 45, 17: 50, 18: 55},
+    "Minion Prince": {9: 10, 10: 20, 11: 30, 12: 40, 13: 50, 14: 60, 15: 70, 16: 80, 17: 90, 18: 95},
 }
 
 # Key troops max levels by Town Hall (simplified - focusing on important troops)
@@ -1987,34 +1989,46 @@ def export_dashboard_data(clan: dict, players_data: list, rush_reports: list,
         # Get historical stats for this player
         hist_player = historical_data.get('players', {}).get(player.get('tag'), {})
         
-        # Extract hero data
+        # Extract hero data with correct max levels for player's TH
+        th_level = player.get('townHallLevel', 1)
         heroes = []
         for hero in player.get('heroes', []):
             if hero.get('village') == 'home':
+                hero_name = hero.get('name')
+                # Get max level for this hero at player's current TH from our defined data
+                max_at_th = get_max_level_for_th(hero_name, th_level, "hero")
                 heroes.append({
-                    'name': hero.get('name'),
+                    'name': hero_name,
                     'level': hero.get('level'),
-                    'maxLevel': hero.get('maxLevel'),
+                    'maxLevel': max_at_th if max_at_th else hero.get('maxLevel'),
                 })
         
-        # Extract key troops
+        # Extract key troops with correct max levels for player's TH
         troops = []
         for troop in player.get('troops', []):
             if troop.get('village') == 'home':
+                troop_name = troop.get('name')
+                # Get max level for this troop at player's current TH from our defined data
+                max_at_th = get_max_level_for_th(troop_name, th_level, "troop")
                 troops.append({
-                    'name': troop.get('name'),
+                    'name': troop_name,
                     'level': troop.get('level'),
-                    'maxLevel': troop.get('maxLevel'),
+                    # Use our defined max if available, otherwise fall back to API value
+                    'maxLevel': max_at_th if max_at_th else troop.get('maxLevel'),
                 })
         
-        # Extract spells
+        # Extract spells with correct max levels for player's TH
         spells = []
         for spell in player.get('spells', []):
             if spell.get('village') == 'home':
+                spell_name = spell.get('name')
+                # Get max level for this spell at player's current TH from our defined data
+                max_at_th = get_max_level_for_th(spell_name, th_level, "spell")
                 spells.append({
-                    'name': spell.get('name'),
+                    'name': spell_name,
                     'level': spell.get('level'),
-                    'maxLevel': spell.get('maxLevel'),
+                    # Use our defined max if available, otherwise fall back to API value
+                    'maxLevel': max_at_th if max_at_th else spell.get('maxLevel'),
                 })
         
         # Extract hero equipment
