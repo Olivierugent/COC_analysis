@@ -1,6 +1,6 @@
 {
   "clan_tag": "#2J28LL2VU",
-  "last_updated": "2026-02-04T18:09:16.272012",
+  "last_updated": "2026-02-05T10:58:49.005221",
   "players": {
     "#28VPLJQCY": {
       "name": "Quinten",
@@ -660,9 +660,9 @@
     "cwl_2026-02": {
       "season": "2026-02",
       "wars_analyzed": 4,
-      "total_attacks": 32,
-      "total_stars": 70,
-      "recorded_date": "2026-02-04T18:09:16.271003",
+      "total_attacks": 45,
+      "total_stars": 107,
+      "recorded_date": "2026-02-05T10:58:47.198014",
       "complete": false
     }
   },
