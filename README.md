@@ -1,70 +1,151 @@
-# Clash of Clans Clan Analyzer 🏰
+# Clash of Clans Clan Analyzer & Dashboard
 
-A comprehensive Python tool for analyzing Clash of Clans clan data with an interactive Streamlit dashboard.
+A comprehensive tool for analyzing Clash of Clans clan data, tracking player statistics, monitoring war performance, and displaying everything in a beautiful Next.js dashboard.
+
+## Architecture
+
+This project uses a **manual scraping approach** to work around the CoC API's static IP requirement:
+
+1. **Python Scraper** (`api/clan_analyzer.py`) - Run manually from your local machine to fetch all data
+2. **JSON Data File** (`coc-dashboard/public/clan_data.json`) - Intermediate storage for scraped data
+3. **Next.js Dashboard** (`coc-dashboard/`) - Beautiful web UI that reads from the JSON file
+
+This architecture allows you to:
+- Run the scraper from any machine with your API key
+- Host the dashboard anywhere (Vercel, Netlify, etc.) without needing API access
+- Update data on-demand without a server
 
 ## Features
 
-- **Clan Overview**: View clan info, level, war stats, and member count
-- **Member Analysis**: Detailed breakdown of all clan members
-- **Rush Detection**: Identifies rushed players by comparing levels to previous TH max
-- **War Performance**: Historical attack tracking for regular wars and CWL
-- **CWL Analysis**: Per-round breakdown with attack direction analysis
-- **Interactive Dashboard**: Beautiful Streamlit web interface with charts and filters
+### Python Scraper
+- **Comprehensive API Coverage**: Fetches data from all relevant CoC API endpoints
+- **Clan Analysis**: Detailed clan information, war statistics, capital data
+- **Player Analysis**: All members with troops, spells, heroes, equipment
+- **Rush Detection**: Advanced algorithm to identify rushed players
+- **War Performance**: War log, current wars, CWL tracking
+- **Capital Raids**: Raid weekend statistics and top raiders
+- **Historical Tracking**: Persistent storage for trend analysis
 
-## Screenshots
+### Next.js Dashboard
+- **Modern Dark UI**: Beautiful gradient design with glassmorphism effects
+- **Overview Tab**: Key stats, TH distribution, rush analysis charts
+- **Players Tab**: Sortable/filterable table with all members
+- **Wars Tab**: War log with results, stars, destruction
+- **Capital Tab**: Raid statistics and top contributors
+- **Player Details Modal**: Click any player for detailed breakdown
+- **Rush Analysis**: Visual indicators for rushed players
 
-![Dashboard Preview](screenshots/dashboard.png)
+## Setup
 
-## Installation
+### 1. Python Environment
 
-1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/coc-clan-analyzer.git
-cd coc-clan-analyzer
-```
-
-2. Install dependencies:
-```bash
+cd api
 pip install -r requirements.txt
 ```
 
-3. Get your API token from [Clash of Clans Developer Portal](https://developer.clashofclans.com/)
+### 2. Configure API Key
 
-4. Update the API token in `clan_analyzer.py` and `streamlit_app.py`
+Create a `.env` file in the root directory:
+
+```env
+api_key=YOUR_COC_API_TOKEN_HERE
+```
+
+Get your API token from [Clash of Clans Developer Portal](https://developer.clashofclans.com/)
+
+> ⚠️ **Important**: API tokens are IP-locked. Create a token for your current IP address.
+
+### 3. Update Clan Tag
+
+Edit `api/clan_analyzer.py` and update the `CLAN_TAG` variable:
+
+```python
+CLAN_TAG = "#YOUR_CLAN_TAG"
+```
+
+### 4. Install Dashboard Dependencies
+
+```bash
+cd coc-dashboard
+npm install
+```
 
 ## Usage
 
-### Command Line Analysis
+### Step 1: Scrape Data
+
+Run the Python scraper to fetch all clan data:
+
 ```bash
+cd api
 python clan_analyzer.py
 ```
 
-### Streamlit Dashboard
+This will:
+- Fetch all clan and player data from the CoC API
+- Analyze rush status for all members
+- Track war performance and CWL
+- Fetch capital raid data
+- Export everything to `coc-dashboard/public/clan_data.json`
+
+### Step 2: View Dashboard
+
+Start the Next.js development server:
+
 ```bash
-streamlit run streamlit_app.py
+cd coc-dashboard
+npm run dev
 ```
 
-The dashboard will open at `http://localhost:8501`
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Configuration
+### Updating Data
 
-Edit the following variables in the scripts:
-- `API_TOKEN`: Your Clash of Clans API token
-- `CLAN_TAG`: Your clan's tag (e.g., "#2J28LL2VU")
+Simply re-run the Python scraper whenever you want fresh data:
 
-⚠️ **Note**: API tokens are IP-restricted. Generate a new token if your IP changes.
+```bash
+python api/clan_analyzer.py
+```
+
+The dashboard will automatically show the new data on refresh.
 
 ## Project Structure
 
 ```
-coc-clan-analyzer/
-├── clan_analyzer.py      # Main analysis script (CLI)
-├── streamlit_app.py      # Streamlit dashboard
-├── requirements.txt      # Python dependencies
-├── clan_history.json     # Historical data storage (auto-generated)
-├── .gitignore           # Git ignore rules
-└── README.md            # This file
+COC_analysis/
+├── .env                    # API key (gitignored)
+├── api/
+│   ├── clan_analyzer.py    # Main scraper script
+│   ├── clan_history.json   # Historical data storage
+│   ├── requirements.txt    # Python dependencies
+│   └── streamlit_app.py    # Legacy Streamlit dashboard
+├── coc-dashboard/
+│   ├── app/
+│   │   ├── components/     # React components
+│   │   ├── types.ts        # TypeScript interfaces
+│   │   ├── page.tsx        # Main dashboard page
+│   │   └── globals.css     # Styling
+│   ├── public/
+│   │   └── clan_data.json  # Scraped data (generated)
+│   └── package.json
+└── README.md
 ```
+
+## API Endpoints Used
+
+The scraper fetches data from these CoC API endpoints:
+
+| Endpoint | Description |
+|----------|-------------|
+| `/clans/{clanTag}` | Clan information |
+| `/clans/{clanTag}/members` | Clan members list |
+| `/clans/{clanTag}/warlog` | War history |
+| `/clans/{clanTag}/currentwar` | Current war status |
+| `/clans/{clanTag}/currentwar/leaguegroup` | CWL group info |
+| `/clans/{clanTag}/capitalraidseasons` | Capital raid data |
+| `/players/{playerTag}` | Detailed player info |
+| `/goldpass/seasons/current` | Gold pass info |
 
 ## Rush Detection Algorithm
 
