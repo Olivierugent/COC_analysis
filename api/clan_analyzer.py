@@ -75,6 +75,7 @@ TROOP_MAX_LEVELS = {
     "Dragon Rider": {14: 2, 15: 3, 16: 3, 17: 4},
     "Electro Titan": {15: 2, 16: 3, 17: 3},
     "Root Rider": {16: 2, 17: 3},
+    
 }
 
 # Spell max levels by Town Hall
